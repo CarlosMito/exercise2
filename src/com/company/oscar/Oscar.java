@@ -4,24 +4,27 @@ import com.company.oscar.exceptions.IdentificadorVazioException;
 import com.company.oscar.exceptions.TempoNegativoException;
 
 public class Oscar {
-    private Interprete interprete;
     private String filme;
+    private String nome;
 
-    // Não vejo motivos para utilizar LocalDate nesse atributo, pois a precisão
+    // Não vejo motivos para utilizar LocalDate nesses atributos, pois a precisão
     // está em anos e não há restrições muito severas de data (além de valores negativos)
+    private int idade;
     private int ano;
 
-    public Oscar(int ano, Interprete interprete, String filme) {
-        this.setInterprete(interprete);
-        this.setFilme((filme));
+    public Oscar(int ano, int idade, String nome, String filme) {
         this.setAno(ano);
+        this.setIdade(idade);
+        this.setNome(nome);
+        this.setFilme((filme));
     }
 
     @Override
     public String toString() {
         return "Oscar{" +
-                "interprete=" + interprete +
-                ", filme='" + filme + '\'' +
+                "filme='" + filme + '\'' +
+                ", nome='" + nome + '\'' +
+                ", idade=" + idade +
                 ", ano=" + ano +
                 '}';
     }
@@ -46,22 +49,33 @@ public class Oscar {
         this.ano = ano;
     }
 
-    public Interprete getInterprete() {
-        return interprete.clonar();
+    public int getIdade() {
+        return idade;
     }
 
-    public void setInterprete(Interprete interprete) {
-        if (interprete == null) throw new NullPointerException();
+    public void setIdade(int idade) {
+        if (idade < 0) throw new TempoNegativoException(idade);
 
-        this.interprete = interprete.clonar();
+        this.idade = idade;
     }
 
-    public static Oscar aPartirDaLinha(String linha, Interprete.Sexo sexo) {
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        if (nome == null || nome.equals("")) throw new IdentificadorVazioException();
+
+        this.nome = nome;
+    }
+
+    public static Oscar aPartirDaLinha(String linha) {
         String[] campos = linha.split("[;\\.,\\t\\|](\\s)");
 
         return new Oscar(
             Integer.parseInt(campos[1]),
-            new Interprete(Integer.parseInt(campos[2]), campos[3], sexo),
+            Integer.parseInt(campos[2]),
+            campos[3],
             campos[4]
         );
     }
