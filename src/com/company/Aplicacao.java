@@ -4,13 +4,12 @@ import com.company.oscar.Interprete;
 import com.company.oscar.Oscar;
 
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,7 +33,7 @@ public class Aplicacao {
     public static void main(String[] args) {
         Aplicacao app = new Aplicacao();
 
-        // TODO: Repensar essas maneira de ler oarquivos CSV. Está com uma semântica estranha.
+        // TODO: Repensar essa maneira de ler oarquivos CSV. Está com uma semântica estranha.
         app.criarOscaresDeArquivoCsv("oscar_age_male.csv", Interprete.Sexo.MASCULINO);
         app.criarOscaresDeArquivoCsv("oscar_age_female.csv", Interprete.Sexo.FEMININO);
 
@@ -48,8 +47,10 @@ public class Aplicacao {
             app::questao5
         };
 
-        for (Respondivel questao : questoes)
+        for (Respondivel questao : questoes) {
             questao.responder();
+            System.out.println();
+        }
     }
 
     private void criarOscaresDeArquivoCsv(String nomeArquivo, Interprete.Sexo sexo) {
@@ -58,7 +59,7 @@ public class Aplicacao {
         try (Stream<String> lines = Files.lines(Paths.get(nomeArquivo))) {
 
             List<Oscar> a = lines.skip(1)
-                    .map((String l) -> Oscar.APartirDaLinha(l, sexo))
+                    .map((String l) -> Oscar.aPartirDaLinha(l, sexo))
                     .collect(Collectors.toList());
 
             this.oscares = Stream.concat(this.oscares.stream(), a.stream())
@@ -95,8 +96,18 @@ public class Aplicacao {
                 .ifPresent((Oscar o) -> System.out.println(o.getInterprete()));
     }
 
+    // TODO: Criar uma classe para ler e transformar (leitura pública e transformação privada)
+
     private void questao2() {
         System.out.println( "[2] Quem foi a atriz que mais vezes foi premiada?");
+
+        Map<String, Long> contagemOscares = this.oscares.stream()
+                .map((Oscar o) -> o.getInterprete().getNome())
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        contagemOscares.entrySet().stream()
+                .max(Comparator.comparingLong(Map.Entry::getValue))
+                .ifPresent(System.out::println);
     }
 
     private void questao3() {

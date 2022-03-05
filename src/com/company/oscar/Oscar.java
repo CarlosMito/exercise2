@@ -56,9 +56,8 @@ public class Oscar {
         this.interprete = interprete.clonar();
     }
 
-    public static Oscar APartirDaLinha(String linha, Interprete.Sexo sexo) {
-        String separator = ";";
-            String[] campos = linha.split("[;\\.,\\t\\|](\\s)");
+    public static Oscar aPartirDaLinha(String linha, Interprete.Sexo sexo) {
+        String[] campos = linha.split("[;\\.,\\t\\|](\\s)");
 
         return new Oscar(
             Integer.parseInt(campos[1]),
