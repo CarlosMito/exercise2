@@ -1,7 +1,7 @@
 package com.company.oscar;
 
-import com.company.oscar.exceptions.AnoNegativoException;
-import com.company.oscar.exceptions.NomeFilmeVazioException;
+import com.company.oscar.exceptions.IdentificadorVazioException;
+import com.company.oscar.exceptions.TempoNegativoException;
 
 public class Oscar {
     private Interprete interprete;
@@ -11,10 +11,19 @@ public class Oscar {
     // está em anos e não há restrições muito severas de data (além de valores negativos)
     private int ano;
 
-    public Oscar(String filme, int ano, Interprete interprete) {
+    public Oscar(int ano, Interprete interprete, String filme) {
         this.setInterprete(interprete);
         this.setFilme((filme));
         this.setAno(ano);
+    }
+
+    @Override
+    public String toString() {
+        return "Oscar{" +
+                "interprete=" + interprete +
+                ", filme='" + filme + '\'' +
+                ", ano=" + ano +
+                '}';
     }
 
     public String getFilme() {
@@ -22,7 +31,7 @@ public class Oscar {
     }
 
     public void setFilme(String filme) {
-        if (filme == null || filme == "") throw new NomeFilmeVazioException();
+        if (filme == null || filme.equals("")) throw new IdentificadorVazioException();
 
         this.filme = filme;
     }
@@ -32,18 +41,29 @@ public class Oscar {
     }
 
     public void setAno(int ano) {
-        if (ano < 0) throw new AnoNegativoException(ano);
+        if (ano < 0) throw new TempoNegativoException(ano);
 
         this.ano = ano;
     }
 
     public Interprete getInterprete() {
-        return interprete.copy();
+        return interprete.clonar();
     }
 
     public void setInterprete(Interprete interprete) {
         if (interprete == null) throw new NullPointerException();
 
-        this.interprete = interprete.copy();
+        this.interprete = interprete.clonar();
+    }
+
+    public static Oscar APartirDaLinha(String linha, Interprete.Sexo sexo) {
+        String separator = ";";
+            String[] campos = linha.split("[;\\.,\\t\\|](\\s)");
+
+        return new Oscar(
+            Integer.parseInt(campos[1]),
+            new Interprete(Integer.parseInt(campos[2]), campos[3], sexo),
+            campos[4]
+        );
     }
 }
