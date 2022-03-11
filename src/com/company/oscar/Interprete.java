@@ -1,7 +1,5 @@
 package com.company.oscar;
 
-import com.company.oscar.exceptions.IdentificadorVazioException;
-import com.company.oscar.exceptions.TempoNegativoException;
 
 public class Interprete {
     private int idade;

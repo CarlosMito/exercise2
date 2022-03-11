@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public class Coletor {
     public static List<Oscar> coletarOscaresArquivoCsv(String nomeArquivo) {
         try (Stream<String> lines = Files.lines(Paths.get(nomeArquivo))) {
-            // O [.skip(1) é para pular o cabeçalho
+            // O [.skip(1)] é para pular o cabeçalho
             return lines.skip(1)
                     .map(Oscar::aPartirDaLinha)
                     .collect(Collectors.toList());

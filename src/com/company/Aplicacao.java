@@ -1,12 +1,8 @@
 package com.company;
 
 import com.company.oscar.Coletor;
-import com.company.oscar.Interprete;
 import com.company.oscar.Oscar;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,39 +41,43 @@ public class Aplicacao {
         }
     }
 
+    private void imprimirResposta(Oscar oscar) {
+        System.out.printf("Nome: %s - Idade: %d\n", oscar.getNome(), oscar.getIdade());
+    }
+
+    private void imprimirResposta(Map.Entry<String, Long> contagem) {
+        System.out.printf("Nome: %s - Oscares: %d\n", contagem.getKey(), contagem.getValue());
+    }
+
     private void questao1() {
         System.out.println("[1] Quem foi o ator mais jovem a ganhar um Oscar?");
 
-        this.oscaresAtores.stream()
+        this.oscaresAtores.stream().skip(1)
                 .min(Comparator.comparingInt(Oscar::getIdade))
-                .ifPresent(System.out::println);
+                .ifPresent(this::imprimirResposta);
     }
 
     private void questao2() {
         System.out.println( "[2] Quem foi a atriz que mais vezes foi premiada?");
 
-        Map<String, Long> contagemOscares = this.oscaresAtrizes.stream()
+        this.oscaresAtrizes.stream()
                 .map(Oscar::getNome)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-
-        contagemOscares.entrySet().stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
                 .max(Comparator.comparingLong(Map.Entry::getValue))
-                .ifPresent(System.out::println);
+                .ifPresent(this::imprimirResposta);
     }
-
-    // TODO: Fazer um método para filtrar, dessa maneira, vai economizar código.
 
     private void questao3() {
         System.out.println("[3] Qual atriz entre 20 e 30 anos que mais vezes foi vencedora?");
 
-        Map<String, Long> contagemOscares = this.oscaresAtrizes.stream()
+        this.oscaresAtrizes.stream()
                 .filter((Oscar o) -> o.getIdade() >= 20 && o.getIdade() <= 30)
                 .map(Oscar::getNome)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-
-        contagemOscares.entrySet().stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
                 .max(Comparator.comparingLong(Map.Entry::getValue))
-                .ifPresent(System.out::println);
+                .ifPresent(this::imprimirResposta);
     }
 
     private void questao4() {
@@ -88,13 +88,12 @@ public class Aplicacao {
                     this.oscaresAtrizes.stream()
                 ).collect(Collectors.toList());
 
-        Map<String, Long> contagemOscares = oscares.stream()
+        oscares.stream()
                 .map(Oscar::getNome)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-
-        contagemOscares.entrySet().stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
                 .filter((Map.Entry<String, Long> m) -> m.getValue() > 1)
-                .forEach(System.out::println);
+                .forEach(this::imprimirResposta);
     }
 
     private void questao5() {
