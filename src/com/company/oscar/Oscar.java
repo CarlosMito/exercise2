@@ -70,7 +70,7 @@ public class Oscar {
     }
 
     public static Oscar aPartirDaLinha(String linha) {
-        String[] campos = linha.split("[;\\.,\\t\\|](\\s)");
+        String[] campos = linha.split("[;\\.,\\t\\|](\\s)*");
 
         return new Oscar(
             Integer.parseInt(campos[1]),
