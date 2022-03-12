@@ -8,6 +8,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.groupingBy;
+
 public class Aplicacao {
 
     // Mesmo podendo utilizar uma Interface Funcional presente na java.util.function,
@@ -49,6 +51,10 @@ public class Aplicacao {
         System.out.printf("Nome: %s - Oscares: %d\n", contagem.getKey(), contagem.getValue());
     }
 
+    private void imprimirOscarSemNome(Oscar o) {
+        System.out.printf("\tFilme: %s - Ano: %d - Idade: %d\n", o.getFilme(), o.getAno(), o.getIdade());
+    }
+
     private void questao1() {
         System.out.println("[1] Quem foi o ator mais jovem a ganhar um Oscar?");
 
@@ -62,7 +68,7 @@ public class Aplicacao {
 
         this.oscaresAtrizes.stream()
                 .map(Oscar::getNome)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .collect(groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream()
                 .max(Comparator.comparingLong(Map.Entry::getValue))
                 .ifPresent(this::imprimirResposta);
@@ -74,7 +80,7 @@ public class Aplicacao {
         this.oscaresAtrizes.stream()
                 .filter((Oscar o) -> o.getIdade() >= 20 && o.getIdade() <= 30)
                 .map(Oscar::getNome)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .collect(groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream()
                 .max(Comparator.comparingLong(Map.Entry::getValue))
                 .ifPresent(this::imprimirResposta);
@@ -90,7 +96,7 @@ public class Aplicacao {
 
         oscares.stream()
                 .map(Oscar::getNome)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .collect(groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream()
                 .filter((Map.Entry<String, Long> m) -> m.getValue() > 1)
                 .forEach(this::imprimirResposta);
@@ -99,16 +105,32 @@ public class Aplicacao {
     private void questao5() {
         System.out.println("[5] Quando informado o nome de um ator ou atriz, dê um resumo de quantos prêmios ele/ela recebeu e liste ano, idade e nome de cada filme pelo qual foi premiado(a).");
 
+        System.out.print("Insira o nome do intérprete: ");
         Scanner scanner = new Scanner(System.in);
-        String pattern = scanner.nextLine().toLowerCase(Locale.ROOT);
+        String input = scanner.nextLine().trim();
+
+        // Define word boundaries para evitar que encontre o padrão em parte do nome do intérprete
+        String pattern = input.isEmpty() ? "" : String.format("(?i).*\\b(%s)\\b.*", input);
 
         List<Oscar> oscares = Stream.concat(
                 this.oscaresAtores.stream(),
                 this.oscaresAtrizes.stream()
         ).collect(Collectors.toList());
 
-        oscares.stream()
-                .filter((Oscar o) -> o.getNome().toLowerCase(Locale.ROOT).contains(pattern))
-                .forEach(System.out::println);
+        List<Oscar> filtrado = oscares.stream()
+                .filter((Oscar o) -> o.getNome().matches(pattern))
+                .collect(Collectors.toList());
+
+        if (filtrado.isEmpty())
+            System.out.println("\nNão foi encontrado nenhum intérprete com esse nome!");
+
+        else {
+            filtrado.stream()
+                    .collect(groupingBy(Oscar::getNome))
+                    .forEach((key, os) -> {
+                        System.out.printf("\nNome: %s (Total: %d)\n", key, os.size());
+                        os.forEach(this::imprimirOscarSemNome);
+                    });
+        }
     }
 }
